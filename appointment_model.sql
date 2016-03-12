@@ -1,4 +1,4 @@
-CREATE procedure [ext].[AppointmentData] (
+alter procedure [ext].[AppointmentData] (
  @sDate DATETIME 
 )
 
@@ -40,8 +40,7 @@ SELECT distinct
 ,case when DATEPART ( dw, cast([appt_date] as date) )=3 then 1 else 0 end as weekday_3
 ,case when DATEPART ( dw, cast([appt_date] as date) )=4 then 1 else 0 end as weekday_4
 ,case when DATEPART ( dw, cast([appt_date] as date) )=5 then 1 else 0 end as weekday_5
-,case when DATEPART ( dw, cast([appt_date] as date) )=6 then 1 else 0 end as weekday_6
-,case when DATEPART ( dw, cast([appt_date] as date) )=7 then 1 else 0 end as weekday_7
+,case when DATEPART ( dw, cast([appt_date] as date) ) between 6 and 7 then 1 else 0 end as weekend
 ,case when datediff(day, appt_create_timestamp, appt_date) = 0 then 0
 	  when datediff(day, appt_create_timestamp, appt_date) =1 then 1 
 	  when datediff(day, appt_create_timestamp, appt_date) between 2 and 14 then 2
@@ -78,8 +77,7 @@ a.pat_id
 ,a.weekday_3
 ,a.weekday_4
 ,a.weekday_5
-,a.weekday_6
-,a.weekday_7
+,a.weekend
 ,a.days_made_in_advance
 ,a.Season
 ,max(case when a.appt_provider_id=b.appt_provider_id then 1 else 0 end) as first_appt_w_prov
@@ -124,8 +122,7 @@ a.pat_id
 ,a.weekday_3
 ,a.weekday_4
 ,a.weekday_5
-,a.weekday_6
-,a.weekday_7
+,a.weekend
 ,a.days_made_in_advance
 ,a.Season
 ,a.rownum
@@ -151,8 +148,7 @@ a.pat_id
 ,a.weekday_3
 ,a.weekday_4
 ,a.weekday_5
-,a.weekday_6
-,a.weekday_7
+,a.weekend
 ,a.season
 ,a.days_made_in_advance
 ,a.days_last_appointment
@@ -359,8 +355,7 @@ SELECT distinct
 ,a.weekday_3
 ,a.weekday_4
 ,a.weekday_5
-,a.weekday_6
-,a.weekday_7
+,a.weekend
 ,a.season
 ,a.days_made_in_advance
 ,a.days_last_appointment
@@ -417,8 +412,7 @@ SELECT
 ,a.weekday_3
 ,a.weekday_4
 ,a.weekday_5
-,a.weekday_6
-,a.weekday_7
+,a.weekend
 ,a.days_made_in_advance
 ,a.days_last_appointment
 ,a.appt_within_year
@@ -553,8 +547,7 @@ SELECT distinct
 ,a.weekday_3
 ,a.weekday_4
 ,a.weekday_5
-,a.weekday_6
-,a.weekday_7
+,a.weekend
 ,a.days_made_in_advance
 ,a.days_last_appointment
 ,a.appt_within_year
@@ -630,8 +623,7 @@ SELECT
 ,a.weekday_3
 ,a.weekday_4
 ,a.weekday_5
-,a.weekday_6
-,a.weekday_7
+,a.weekend
 ,a.days_made_in_advance
 ,a.days_last_appointment
 ,a.appt_within_year
@@ -681,7 +673,8 @@ FROM #pat_appt_stats2 a
 
 
 
---Get output
+--Get output  
+--The lower section with diagnosis from clinical tables is only needed for clients which don't have measures/events calculated
 INSERT INTO [AnalyticsMonitoring].[ext].[Appointment_data](
 	[appt_kept] ,
 	[appt_can] ,
@@ -695,8 +688,7 @@ INSERT INTO [AnalyticsMonitoring].[ext].[Appointment_data](
 	[weekday_3] ,
 	[weekday_4] ,
 	[weekday_5] ,
-	[weekday_6] ,
-	[weekday_7] ,
+	[weekend] ,
 	[days_made_in_advance] ,
 	[days_last_appointment] ,
 	[appt_within_year] ,
@@ -761,8 +753,7 @@ a.appt_kept
 ,a.weekday_3
 ,a.weekday_4
 ,a.weekday_5
-,a.weekday_6
-,a.weekday_7
+,a.weekend
 ,a.days_made_in_advance
 ,a.days_last_appointment
 ,a.appt_within_year
